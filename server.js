@@ -26,6 +26,7 @@ app.get('/api/robots', (req, res) => {
         res.status(200).send(botsArr)
     } catch (error) {
         console.log('ERROR GETTING BOTS', error)
+        rollbar.critical('ERROR GETTING ALL BOTS', error)
         res.sendStatus(400)
     }
 })
@@ -35,15 +36,18 @@ app.get('/api/robots/five', (req, res) => {
         let shuffled = shuffleArray(bots)
         let choices = shuffled.slice(0, 5)
         let compDuo = shuffled.slice(6, 8)
+        rollbar.log('five bots retreived')
         res.status(200).send({choices, compDuo})
     } catch (error) {
         console.log('ERROR GETTING FIVE BOTS', error)
+        rollbar.error("ERROR GETTING FIVE BOTS", error)
         res.sendStatus(400)
     }
 })
 
 app.post('/api/duel', (req, res) => {
     try {
+        rollbar.log('Bots are fighting')
         // getting the duos from the front end
         let {compDuo, playerDuo} = req.body
 
@@ -62,22 +66,27 @@ app.post('/api/duel', (req, res) => {
         // comparing the total health to determine a winner
         if (compHealthAfterAttack > playerHealthAfterAttack) {
             playerRecord.losses++
+            rollbar.log('Player Lost')
             res.status(200).send('You lost!')
         } else {
             playerRecord.losses++
+            rollbar.log('Player Won')
             res.status(200).send('You won!')
         }
     } catch (error) {
         console.log('ERROR DUELING', error)
+        rollbar.critical('ERROR DUELING', error)
         res.sendStatus(400)
     }
 })
 
 app.get('/api/player', (req, res) => {
     try {
+        rollbar.log('Showing player stats')
         res.status(200).send(playerRecord)
     } catch (error) {
         console.log('ERROR GETTING PLAYER STATS', error)
+        rollbar.warning("Problem Showing Player Stats", error)
         res.sendStatus(400)
     }
 })
