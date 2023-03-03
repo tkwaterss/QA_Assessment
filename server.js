@@ -3,9 +3,19 @@ const app = express()
 const {bots, playerRecord} = require('./data')
 const {shuffleArray} = require('./utils')
 
+const Rollbar = require('rollbar')
+const rollbar = new Rollbar({
+  accessToken: '33473dadea4f4add98a647f3da108a18',
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+})
+
+
 app.use(express.json())
 
 app.use(express.static('public'))
+
+rollbar.log('Hello World')
 
 app.get('/', (req, res) => {
     res.status(200).sendFile(path.join(__dirname, '/public/index.html'))
